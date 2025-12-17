@@ -27,7 +27,6 @@ app.post('/predict', (req, res) => {
 
     const pythonPath = path.join(__dirname, 'ml/predict.py');
 
-    // Pick python command (works on Windows + Railway after nixpacks)
     const pythonCmd = process.platform === 'win32' ? 'python' : 'python';
 
     const payload = {
@@ -40,7 +39,7 @@ app.post('/predict', (req, res) => {
         loan_amount: Number(loan_amount),
     };
 
-    // validate so NaN doesn't get passed to python
+    // validate so NaN doesn't get passed to ML
     for (const [k, v] of Object.entries(payload)) {
         if (!Number.isFinite(v)) {
             return res.status(400).json({ error: `Invalid number for ${k}`, received: req.body });
@@ -51,10 +50,12 @@ app.post('/predict', (req, res) => {
     const respond = (status, body) => {
         if (responded) return;
         responded = true;
-        res.status(status).json(body);
+        res.status(status).json(body);  
     };
 
-    const pythonProcess = spawn(pythonCmd, [pythonPath]);
+    const pythonProcess = spawn('python', [pythonPath], {
+        cwd: path.join(__dirname, 'ml'), 
+    });
 
     pythonProcess.on('error', (err) => {
         respond(500, {
