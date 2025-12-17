@@ -25,10 +25,6 @@ loan_amount = np.random.normal(20000, 10000, n_samples) # including loan_amount 
 # Rules: approve if income > 40000 and credit_score > 600
 approved = ((income > 40000) & (credit_score > 600)).astype(int)
 
-#  noise
-noise = np.random.choice([0,1], n_samples, p=[0.9, 0.1])
-approved = approved ^ noise
-
 data = pd.DataFrame({
     'income': income,
     'credit_score': credit_score,
