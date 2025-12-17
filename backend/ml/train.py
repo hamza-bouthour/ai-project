@@ -7,7 +7,10 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 import joblib
+import os
 
+
+os.makedirs("../data", exist_ok=True)
 #  synthetic dataset
 np.random.seed(42)
 n_samples = 1000
