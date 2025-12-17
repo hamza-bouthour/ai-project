@@ -11,8 +11,8 @@ nixPkgs = [
 [phases.install]
 cmds = [
   "npm install",
-  "cd backend && pip install -r ml/requirements.txt"
+  "pip install -r ml/requirements.txt"
 ]
 
 [start]
-cmd = "cd backend && node server.js"
+cmd = "node server.js"
