@@ -4,7 +4,7 @@ const { spawn } = require('child_process');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -15,44 +15,61 @@ app.get('/', (req, res) => {
 });
 
 app.post('/predict', (req, res) => {
-    const { income, credit_score, credit_card_usage, education_level, family_size, age, loan_amount } = req.body;
+    const {
+        income,
+        credit_score,
+        credit_card_usage,
+        education_level,
+        family_size,
+        age,
+        loan_amount,
+    } = req.body;
 
-    const pythonProcess = spawn('python', [path.join(__dirname, '../ml/predict.py')], {
-        stdio: ['pipe', 'pipe', 'pipe']
-    });
+    const pythonPath = path.join(__dirname, '../ml/predict.py');
+
+    const pythonProcess = spawn('python', [pythonPath]);
 
     const inputData = JSON.stringify({
-        income: parseFloat(income),
-        credit_score: parseFloat(credit_score),
-        credit_card_usage: parseFloat(credit_card_usage),
-        education_level: parseInt(education_level),
-        family_size: parseInt(family_size),
-        age: parseFloat(age),
-        loan_amount: parseFloat(loan_amount)
+        income: Number(income),
+        credit_score: Number(credit_score),
+        credit_card_usage: Number(credit_card_usage),
+        education_level: Number(education_level),
+        family_size: Number(family_size),
+        age: Number(age),
+        loan_amount: Number(loan_amount),
     });
 
     pythonProcess.stdin.write(inputData);
     pythonProcess.stdin.end();
 
-    let output = '';
+    let stdout = '';
+    let stderr = '';
+
     pythonProcess.stdout.on('data', (data) => {
-        output += data.toString();
+        stdout += data.toString();
     });
 
     pythonProcess.stderr.on('data', (data) => {
-        console.error(`Python error: ${data}`);
+        stderr += data.toString();
+        console.error('Python stderr:', data.toString());
     });
 
     pythonProcess.on('close', (code) => {
-        if (code === 0) {
-            try {
-                const result = JSON.parse(output);
-                res.json(result);
-            } catch (e) {
-                res.status(500).json({ error: 'Failed to parse prediction result' });
-            }
-        } else {
-            res.status(500).json({ error: 'Prediction failed' });
+        if (code !== 0) {
+            return res.status(500).json({
+                error: 'Python process failed',
+                details: stderr || null,
+            });
+        }
+
+        try {
+            const result = JSON.parse(stdout);
+            res.json(result);
+        } catch (err) {
+            res.status(500).json({
+                error: 'Invalid response from model',
+                raw: stdout,
+            });
         }
     });
 });
