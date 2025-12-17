@@ -8,13 +8,18 @@ nixPkgs = [
 [phases.install]
 cmds = [
   "npm install",
+
+  # wipe any previous broken python deps
+  "rm -rf pydeps",
   "mkdir -p pydeps",
-  "/root/.nix-profile/bin/pip install --target=pydeps numpy pandas scikit-learn joblib"
+
+  # force binary wheels only (prevents numpy source-tree install)
+  "/root/.nix-profile/bin/pip install --only-binary=:all: --target=pydeps numpy pandas scikit-learn joblib"
 ]
 
 [phases.build]
 cmds = [
-  "PYTHONPATH=/app/pydeps /root/.nix-profile/bin/python3 ml/train.py"
+  "cd /app && PYTHONPATH=/app/pydeps /root/.nix-profile/bin/python3 ml/train.py"
 ]
 
 [start]
