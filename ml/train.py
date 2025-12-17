@@ -19,13 +19,10 @@ credit_card_usage = np.random.normal(0.5, 0.2, n_samples)
 education_level = np.random.choice([0, 1, 2], n_samples)  # 0: high school, 1: bachelor's, 2: master's
 family_size = np.random.poisson(3, n_samples)
 age = np.random.normal(35, 10, n_samples)
-
-# Loan amount will be added later, but for now, assume it's part of features or separate
-# For simplicity, include loan_amount as feature
-loan_amount = np.random.normal(20000, 10000, n_samples)
+loan_amount = np.random.normal(20000, 10000, n_samples) # including loan_amount as feature
 
 # Target: loan approval (1: approved, 0: not)
-# Simple rule: approve if income > 40000 and credit_score > 600
+# Rules: approve if income > 40000 and credit_score > 600
 approved = ((income > 40000) & (credit_score > 600)).astype(int)
 
 #  noise
@@ -51,7 +48,6 @@ y = data['approved']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Train models
 models = {
     'LogisticRegression': LogisticRegression(),
     'KNN': KNeighborsClassifier(),
@@ -71,6 +67,6 @@ for name, model in models.items():
         best_accuracy = acc
         best_model = model
 
-# Save the best model
+# best model
 joblib.dump(best_model, 'best_model.pkl')
 print(f'Best model: {type(best_model).__name__} with accuracy {best_accuracy:.4f}')
