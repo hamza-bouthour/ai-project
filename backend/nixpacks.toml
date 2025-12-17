@@ -17,7 +17,7 @@ cmds = [
 cmds = [
   # remove any accidental local shadowing packages in the app dir
   "rm -rf /app/numpy /app/pandas /app/sklearn /app/joblib /app/ml/numpy /app/ml/pandas /app/ml/sklearn /app/ml/joblib || true",
-  "cd ml && python3 train.py"
+ "cd ml && /root/.nix-profile/bin/python3 train.py"
 ]
 
 [start]
