@@ -2,22 +2,19 @@
 nixPkgs = [
   "nodejs_20",
   "python311",
-  "python311Packages.numpy",
-  "python311Packages.pandas",
-  "python311Packages.scikit-learn",
-  "python311Packages.joblib"
+  "python311Packages.pip"
 ]
 
 [phases.install]
 cmds = [
-  "npm install"
+  "npm install",
+  "mkdir -p pydeps",
+  "/root/.nix-profile/bin/pip install --target=pydeps numpy pandas scikit-learn joblib"
 ]
 
 [phases.build]
 cmds = [
-  # remove any accidental local shadowing packages in the app dir
-  "rm -rf /app/numpy /app/pandas /app/sklearn /app/joblib /app/ml/numpy /app/ml/pandas /app/ml/sklearn /app/ml/joblib || true",
- "cd ml && /root/.nix-profile/bin/python3 train.py"
+  "PYTHONPATH=/app/pydeps /root/.nix-profile/bin/python3 ml/train.py"
 ]
 
 [start]
