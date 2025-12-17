@@ -63,7 +63,13 @@ app.post('/predict', (req, res) => {
         });
     });
 
+    const t = setTimeout(() => {
+        pythonProcess.kill('SIGKILL');
+        return res.status(500).json({ error: 'Python timed out' });
+        }, 8000);
+
     pythonProcess.on('close', (code) => {
+        clearTimeout(t);
         if (code !== 0) {
             return res.status(500).json({
                 error: 'Python process failed',
