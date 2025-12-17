@@ -8,7 +8,7 @@ nixPkgs = [
 [phases.install]
 cmds = [
   "npm install",
-  "python3 -m pip install --break-system-packages numpy pandas scikit-learn joblib"
+  "/root/.nix-profile/bin/pip install --break-system-packages numpy pandas scikit-learn joblib"
 ]
 
 [phases.build]
