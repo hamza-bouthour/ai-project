@@ -81,10 +81,8 @@
             document.getElementById('approval').textContent = '';
             resultDiv.classList.remove('approved', 'denied');
             const formData = new FormData(e.target);
-            console.log('Form Data:', formData);
             const data = Object.fromEntries(formData);
 
-            // Estimate car value (mock)
             const carValue = estimateCarValue(data.make, data.model, parseInt(data.year));
 
             const payload = {
@@ -111,7 +109,6 @@
             } catch (error) {
                 alert('Error: ' + error.message);
             }
-            console.log('Payload:', payload);
         });
 
         function estimateCarValue(make, model, year) {

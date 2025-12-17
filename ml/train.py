@@ -8,11 +8,11 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 import joblib
 
-# Generate synthetic dataset
+#  synthetic dataset
 np.random.seed(42)
 n_samples = 1000
 
-# Features
+# features
 income = np.random.normal(50000, 15000, n_samples)
 credit_score = np.random.normal(650, 100, n_samples)
 credit_card_usage = np.random.normal(0.5, 0.2, n_samples)
@@ -28,11 +28,10 @@ loan_amount = np.random.normal(20000, 10000, n_samples)
 # Simple rule: approve if income > 40000 and credit_score > 600
 approved = ((income > 40000) & (credit_score > 600)).astype(int)
 
-# Add some noise
+#  noise
 noise = np.random.choice([0,1], n_samples, p=[0.9, 0.1])
 approved = approved ^ noise
 
-# Create DataFrame
 data = pd.DataFrame({
     'income': income,
     'credit_score': credit_score,
@@ -44,10 +43,9 @@ data = pd.DataFrame({
     'approved': approved
 })
 
-# Save dataset
 data.to_csv('../data/loan_data.csv', index=False)
 
-# Prepare data for training
+
 X = data.drop('approved', axis=1)
 y = data['approved']
 

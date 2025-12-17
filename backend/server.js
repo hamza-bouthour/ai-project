@@ -17,7 +17,6 @@ app.get('/', (req, res) => {
 app.post('/predict', (req, res) => {
     const { income, credit_score, credit_card_usage, education_level, family_size, age, loan_amount } = req.body;
 
-    // Call Python script
     const pythonProcess = spawn('python', [path.join(__dirname, '../ml/predict.py')], {
         stdio: ['pipe', 'pipe', 'pipe']
     });
