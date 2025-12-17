@@ -18,6 +18,7 @@ features = [
     input_data['family_size'],
     input_data['age'],
     input_data['loan_amount']
+    
 ]
 
 df = pd.DataFrame([features], columns=['income', 'credit_score', 'credit_card_usage', 'education_level', 'family_size', 'age', 'loan_amount'])
