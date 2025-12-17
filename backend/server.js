@@ -27,9 +27,10 @@ app.post('/predict', (req, res) => {
 
     const pythonPath = path.join(__dirname, 'ml/predict.py');
 
-    const pythonProcess = spawn('python', [pythonPath]);
+    // Pick python command (works on Windows + Railway after nixpacks)
+    const pythonCmd = process.platform === 'win32' ? 'python' : 'python';
 
-    const inputData = JSON.stringify({
+    const payload = {
         income: Number(income),
         credit_score: Number(credit_score),
         credit_card_usage: Number(credit_card_usage),
@@ -37,9 +38,40 @@ app.post('/predict', (req, res) => {
         family_size: Number(family_size),
         age: Number(age),
         loan_amount: Number(loan_amount),
+    };
+
+    // validate so NaN doesn't get passed to python
+    for (const [k, v] of Object.entries(payload)) {
+        if (!Number.isFinite(v)) {
+            return res.status(400).json({ error: `Invalid number for ${k}`, received: req.body });
+        }
+    }
+
+    let responded = false;
+    const respond = (status, body) => {
+        if (responded) return;
+        responded = true;
+        res.status(status).json(body);
+    };
+
+    const pythonProcess = spawn(pythonCmd, [pythonPath]);
+
+    pythonProcess.on('error', (err) => {
+        respond(500, {
+            error: 'Failed to start Python',
+            details: err.message,
+            pythonCmd,
+            pythonPath,
+        });
     });
 
-    pythonProcess.stdin.write(inputData);
+    // Timeout guard (prevents Railway 502 from hanging)
+    const t = setTimeout(() => {
+        try { pythonProcess.kill('SIGKILL'); } catch {}
+        respond(500, { error: 'Python timed out' });
+    }, 8000);
+
+    pythonProcess.stdin.write(JSON.stringify(payload));
     pythonProcess.stdin.end();
 
     let stdout = '';
@@ -53,25 +85,12 @@ app.post('/predict', (req, res) => {
         stderr += data.toString();
         console.error('Python stderr:', data.toString());
     });
-        
-    pythonProcess.on('error', (err) => {
-        return res.status(500).json({
-            error: 'Failed to start Python',
-            details: err.message,
-            pythonCmd,
-            pythonPath,
-        });
-    });
-
-    const t = setTimeout(() => {
-        pythonProcess.kill('SIGKILL');
-        return res.status(500).json({ error: 'Python timed out' });
-        }, 8000);
 
     pythonProcess.on('close', (code) => {
         clearTimeout(t);
+
         if (code !== 0) {
-            return res.status(500).json({
+            return respond(500, {
                 error: 'Python process failed',
                 details: stderr || null,
             });
@@ -79,15 +98,17 @@ app.post('/predict', (req, res) => {
 
         try {
             const result = JSON.parse(stdout);
-            res.json(result);
+            respond(200, result);
         } catch (err) {
-            res.status(500).json({
+            respond(500, {
                 error: 'Invalid response from model',
                 raw: stdout,
+                details: stderr || null,
             });
         }
     });
 });
+
 
 app.listen(PORT, () => {
     console.log(`Server running on ${PORT}`);
