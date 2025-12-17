@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
 app.post('/predict', (req, res) => {
@@ -25,7 +25,7 @@ app.post('/predict', (req, res) => {
         loan_amount,
     } = req.body;
 
-    const pythonPath = path.join(__dirname, '../ml/predict.py');
+    const pythonPath = path.join(__dirname, 'ml/predict.py');
 
     const pythonProcess = spawn('python', [pythonPath]);
 
