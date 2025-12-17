@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Loan Approval Assistant</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Car Loan Approval Assistant</h1>
+        <form id="loanForm">
+            <div class="form-sections">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="income">Annual Income:</label>
+                        <input type="number" id="income" name="income" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="credit_score">Credit Score:</label>
+                        <input type="number" id="credit_score" name="credit_score" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="credit_card_usage">Credit Card Usage (0-1):</label>
+                        <input type="number" id="credit_card_usage" name="credit_card_usage" min="0" max="1" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="education_level">Education Level:</label>
+                        <select id="education_level" name="education_level" required>
+                            <option value="0">High School</option>
+                            <option value="1">Bachelor's</option>
+                            <option value="2">Master's</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="family_size">Family Size:</label>
+                        <input type="number" id="family_size" name="family_size" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Age:</label>
+                        <input type="number" id="age" name="age" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="make">Car Make:</label>
+                        <input type="text" id="make" name="make" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="model">Car Model:</label>
+                        <input type="text" id="model" name="model" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="year">Car Year:</label>
+                        <input type="number" id="year" name="year" required>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">Check Approval</button>
+        </form>
+
+        <div id="result">
+            <h2>Result</h2>
+            <p id="approval"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loanForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('result');
+            document.getElementById('approval').textContent = '';
+            resultDiv.classList.remove('approved', 'denied');
+            const formData = new FormData(e.target);
+            console.log('Form Data:', formData);
+            const data = Object.fromEntries(formData);
+
+            // Estimate car value (mock)
+            const carValue = estimateCarValue(data.make, data.model, parseInt(data.year));
+
+            const payload = {
+                income: parseFloat(data.income),
+                credit_score: parseFloat(data.credit_score),
+                credit_card_usage: parseFloat(data.credit_card_usage),
+                education_level: parseInt(data.education_level),
+                family_size: parseInt(data.family_size),
+                age: parseFloat(data.age),
+                loan_amount: carValue
+            };
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                document.getElementById('approval').textContent = result.approved ? 'Approved' : 'Not Approved';
+                const resultDiv = document.getElementById('result');
+                resultDiv.classList.add(result.approved ? 'approved' : 'denied');
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+            console.log('Payload:', payload);
+        });
+
+        function estimateCarValue(make, model, year) {
+            // Mock estimation: base price 20000, adjust by year
+            const basePrice = 20000;
+            const age = new Date().getFullYear() - year;
+            const depreciation = age * 1000;
+            return Math.max(basePrice - depreciation, 5000);
+        }
+    </script>
+</body>
+</html>
