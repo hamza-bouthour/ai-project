@@ -1,11 +1,15 @@
 [phases.setup]
-nixPkgs = ["nodejs_20", "python311", "python311Packages.pip"]
+nixPkgs = [
+  "nodejs_20",
+  "python311",
+  "python311Packages.numpy",
+  "python311Packages.pandas",
+  "python311Packages.scikit-learn",
+  "python311Packages.joblib"
+]
 
 [phases.install]
-cmds = [
-  "npm install",
-  "pip install --break-system-packages -r ml/requirements.txt"
-]
+cmds = ["npm install"]
 
 [start]
 cmd = "node server.js"
