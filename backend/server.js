@@ -27,7 +27,9 @@ app.post('/predict', (req, res) => {
 
     const pythonPath = path.join(__dirname, 'ml/predict.py');
 
-    const pythonProcess = spawn('python', [pythonPath]);
+    const pythonCmd = process.platform === "win32" ? "python" : "python3";
+
+    const pythonProcess = spawn(pythonCmd, [pythonPath]);
 
     const inputData = JSON.stringify({
         income: Number(income),
@@ -52,6 +54,15 @@ app.post('/predict', (req, res) => {
     pythonProcess.stderr.on('data', (data) => {
         stderr += data.toString();
         console.error('Python stderr:', data.toString());
+    });
+        
+    pythonProcess.on('error', (err) => {
+        return res.status(500).json({
+            error: 'Failed to start Python',
+            details: err.message,
+            pythonCmd,
+            pythonPath,
+        });
     });
 
     pythonProcess.on('close', (code) => {
