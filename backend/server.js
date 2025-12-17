@@ -27,9 +27,7 @@ app.post('/predict', (req, res) => {
 
     const pythonPath = path.join(__dirname, 'ml/predict.py');
 
-    const pythonCmd = process.platform === "win32" ? "python" : "python3";
-
-    const pythonProcess = spawn(pythonCmd, [pythonPath]);
+    const pythonProcess = spawn('python', [pythonPath]);
 
     const inputData = JSON.stringify({
         income: Number(income),
