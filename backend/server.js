@@ -27,7 +27,12 @@ app.post('/predict', (req, res) => {
 
     const pythonPath = path.join(__dirname, 'ml/predict.py');
 
-    const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+    const pythonCmd = path.join(__dirname, '.venv/bin/python');
+
+       const pythonProcess = spawn(pythonCmd, [pythonPath], {
+        cwd: path.join(__dirname, 'ml'), 
+         env: { ...process.env },
+    });
 
     const payload = {
         income: Number(income),
@@ -53,9 +58,7 @@ app.post('/predict', (req, res) => {
         res.status(status).json(body);  
     };
 
-    const pythonProcess = spawn(pythonCmd, [pythonPath], {
-        cwd: path.join(__dirname, 'ml'), 
-    });
+
 
     pythonProcess.on('error', (err) => {
         respond(500, {
