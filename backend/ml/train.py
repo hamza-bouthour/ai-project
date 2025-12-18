@@ -8,6 +8,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 import joblib
 import os
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 
 os.makedirs("../data", exist_ok=True)
@@ -25,8 +27,15 @@ age = np.random.normal(35, 10, n_samples)
 loan_amount = np.random.normal(20000, 10000, n_samples) # including loan_amount as feature
 
 # Target: loan approval (1: approved, 0: not)
-# Rules: approve if income > 40000 and credit_score > 600
-approved = ((income > 40000) & (credit_score > 600)).astype(int)
+# Rules: multiple factors
+loan_to_income = loan_amount / np.maximum(income, 1)
+approved = (
+    (credit_score > 620) &
+    (income > 35000) &
+    (loan_to_income < 0.45) &
+    (credit_card_usage < 0.75) &
+    (age >= 18)
+).astype(int)
 
 data = pd.DataFrame({
     'income': income,
@@ -48,9 +57,18 @@ y = data['approved']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 models = {
-    'LogisticRegression': LogisticRegression(),
-    'KNN': KNeighborsClassifier(),
-    'SVM': SVC(),
+    'LogisticRegression': Pipeline([
+        ('scaler', StandardScaler()),
+        ('model', LogisticRegression(max_iter=2000))
+    ]),
+    'KNN': Pipeline([
+        ('scaler', StandardScaler()),
+        ('model', KNeighborsClassifier())
+    ]),
+    'SVM': Pipeline([
+        ('scaler', StandardScaler()),
+        ('model', SVC())
+    ]),
     'DecisionTree': DecisionTreeClassifier()
 }
 
