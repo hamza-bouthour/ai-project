@@ -7,14 +7,10 @@ nixPkgs = [
 [phases.install]
 cmds = [
   "npm install",
-
-  # fresh venv every build (prevents broken numpy source-tree leftovers)
   "rm -rf .venv",
   "python3 -m venv .venv",
-
-  # upgrade tooling + force wheels
   ".venv/bin/pip install -U pip setuptools wheel",
-  ".venv/bin/pip install --only-binary=:all: numpy pandas scikit-learn joblib"
+  ".venv/bin/pip install numpy pandas scikit-learn joblib"
 ]
 
 [phases.build]
