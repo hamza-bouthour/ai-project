@@ -1,11 +1,5 @@
 import os
 import sys
-
-print("CWD:", os.getcwd(), file=sys.stderr)
-print("DIR LIST:", os.listdir("."), file=sys.stderr)
-print("FILE:", __file__, file=sys.stderr)
-print("SYSPATH0:", sys.path[0], file=sys.stderr)
-
 import joblib
 import json
 import pandas as pd

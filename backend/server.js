@@ -44,7 +44,7 @@ app.post('/predict', (req, res) => {
         loan_amount: Number(loan_amount),
     };
 
-    // validate so NaN doesn't get passed to ML
+    // validate NaN values
     for (const [k, v] of Object.entries(payload)) {
         if (!Number.isFinite(v)) {
             return res.status(400).json({ error: `Invalid number for ${k}`, received: req.body });
@@ -69,7 +69,7 @@ app.post('/predict', (req, res) => {
         });
     });
 
-    // Timeout guard (prevents Railway 502 from hanging)
+    // timeout guard for Railway
     const t = setTimeout(() => {
         try { pythonProcess.kill('SIGKILL'); } catch {}
         respond(500, { error: 'Python timed out' });
