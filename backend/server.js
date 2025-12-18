@@ -27,7 +27,7 @@ app.post('/predict', (req, res) => {
 
     const pythonPath = path.join(__dirname, 'ml/predict.py');
 
-    const pythonCmd = path.join(__dirname, '.venv/bin/python');
+    const pythonCmd = path.join(process.cwd(), '.venv/bin/python');
 
        const pythonProcess = spawn(pythonCmd, [pythonPath], {
         cwd: path.join(__dirname, 'ml'), 
