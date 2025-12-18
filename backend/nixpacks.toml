@@ -11,7 +11,7 @@ nixPkgs = [
 cmds = [
   "npm install",
   "rm -rf .venv",
-  "python3 -m venv .venv",
+  "python3 -m venv --system-site-packages .venv",
   ".venv/bin/pip install -U pip setuptools wheel",
   ".venv/bin/pip install joblib==1.3.2"
 ]
