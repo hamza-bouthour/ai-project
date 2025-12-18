@@ -5,8 +5,13 @@ nixPkgs = [
   "python311Packages.numpy",
   "python311Packages.pandas",
   "python311Packages.scikit-learn",
+  "python311Packages.scipy",
   "python311Packages.pytz",
-  "python311Packages.python-dateutil"
+  "python311Packages.python-dateutil",
+  "python311Packages.six",
+  "python311Packages.tzdata",
+  "python311Packages.threadpoolctl",
+  "python311Packages.joblib"
 ]
 
 [phases.install]
