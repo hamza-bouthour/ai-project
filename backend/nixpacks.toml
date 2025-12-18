@@ -2,7 +2,9 @@
 nixPkgs = [
   "nodejs_20",
   "python311",
-  "zlib"
+  "python311Packages.numpy",
+  "python311Packages.pandas",
+  "python311Packages.scikit-learn"
 ]
 
 [phases.install]
@@ -11,7 +13,7 @@ cmds = [
   "rm -rf .venv",
   "python3 -m venv .venv",
   ".venv/bin/pip install -U pip setuptools wheel",
-  ".venv/bin/pip install numpy==1.24.3 pandas==2.1.4 scikit-learn==1.3.2 joblib==1.3.2"
+  ".venv/bin/pip install joblib==1.3.2"
 ]
 
 [phases.build]
